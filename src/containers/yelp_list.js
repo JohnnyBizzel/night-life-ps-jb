@@ -38,7 +38,7 @@ class YelpList extends Component {
         return business.id
       })
       this.props.getAllReservationsFromYelpList(ids).then(()=>{
-      this.props.updateReservations(this.props.yelpListings[0].jsonBody.businesses, this.props.whosGoing.data)  
+      this.props.updateReservations(this.props.yelpListings[0].jsonBody.businesses, this.props.whosGoing)  
         this.setState({
           whosGoing: this.props.sortedWhosGoing
         })

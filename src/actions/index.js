@@ -156,10 +156,11 @@ export function getAllReservationsFromYelpList(ids) {
       headers: { authorization: localStorage.getItem('token') }
     })
       .then(response => {
+      console.log(response);
         dispatch({
           type: FETCH_WHOSGOING,
           payload: response
-        });1
+        });
       });
   }
 }

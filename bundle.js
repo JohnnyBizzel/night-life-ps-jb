@@ -34376,10 +34376,11 @@
 	    return _axios2.default.post(url, { ids: ids }, {
 	      headers: { authorization: localStorage.getItem('token') }
 	    }).then(function (response) {
+	      console.log(response);
 	      dispatch({
 	        type: _types.FETCH_WHOSGOING,
 	        payload: response
-	      });1;
+	      });
 	    });
 	  };
 	}
@@ -35980,7 +35981,7 @@
 	          return business.id;
 	        });
 	        _this2.props.getAllReservationsFromYelpList(ids).then(function () {
-	          _this2.props.updateReservations(_this2.props.yelpListings[0].jsonBody.businesses, _this2.props.whosGoing.data);
+	          _this2.props.updateReservations(_this2.props.yelpListings[0].jsonBody.businesses, _this2.props.whosGoing);
 	          _this2.setState({ term: '' });
 	        });
 	      });
@@ -36111,7 +36112,7 @@
 	          return business.id;
 	        });
 	        _this2.props.getAllReservationsFromYelpList(ids).then(function () {
-	          _this2.props.updateReservations(_this2.props.yelpListings[0].jsonBody.businesses, _this2.props.whosGoing.data);
+	          _this2.props.updateReservations(_this2.props.yelpListings[0].jsonBody.businesses, _this2.props.whosGoing);
 	          _this2.setState({
 	            whosGoing: _this2.props.sortedWhosGoing
 	          });
@@ -37059,21 +37060,37 @@
 	  value: true
 	});
 
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
 	exports.default = function () {
 	  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 	  var action = arguments[1];
 
 	  switch (action.type) {
 	    case _types.FETCH_RSVP:
-	      return _extends({ fetch: action.payload.data }, state);
+	      var newState = new Object();
+	      newState = Object.assign({}, state);
+	      newState.fetch = action.payload.data;
+	      return newState;
 	    case _types.ADD_RSVP:
-	      return _extends({ add: action.payload.data }, state);
+	      var newState2 = new Object();
+	      newState2 = Object.assign({}, state);
+	      newState2.whosGoing.push(action.payload.data);
+	      return newState2;
+	    //return { add: action.payload.data, ...state }
 	    case _types.FETCH_WHOSGOING:
-	      return _extends({}, state, { whosGoing: action.payload });
+	      var newState3 = new Object();
+	      newState3 = Object.assign({}, state);
+	      if (action.payload.data) {
+	        newState3.whosGoing = action.payload.data;
+	      }
+
+	      return newState3;
+	    // return [ ...state, {whosGoing: action.payload.data} ]
 	    case _types.SORTED_WHOSGOING:
-	      return _extends({}, state, { sortedWhosGoing: action.payload });
+	      var newState4 = new Object();
+	      newState4 = Object.assign({}, state);
+	      newState4.sortedWhosGoing = action.payload;
+	      return newState4;
+	    // return { ...state, sortedWhosGoing: action.payload  }
 	  }
 	  return state;
 	};
