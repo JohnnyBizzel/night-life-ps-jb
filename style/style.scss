@@ -1,0 +1,109 @@
+.error {
+  color: red;
+}
+
+ul.nav.navbar-nav {
+  flex-direction: row;
+  li {
+    margin: 5px;
+  }
+} 
+
+.test {
+  color: red;
+}
+
+.going {
+  margin-left: 5px;
+}
+
+.navbar-brand {
+  font-family: Lobster;
+}
+
+.heading {
+  font-size: 2em;
+}
+
+.title {
+  font-family: Lobster;
+  padding: 15px;
+}
+
+.subheading {
+  font-size: 1.5em;
+  padding: 20px;
+}
+
+.yelp-list {
+  width: 100%;
+}
+
+.card {
+  width: 100%;
+  margin: 3px;
+}
+.nogo-message {
+  color: slategray;
+}
+
+.welcome {
+  .appname {
+    font-family: lobster;
+  }
+  .subheading {
+    font-size: 0.9em;
+  }
+}
+
+.searchbox {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.whosgoing{
+  display:inline-block;
+  .whosgoing-modal {
+    padding: 5px;
+  }
+  h2 {
+    font-family: Lobster;
+  }
+  .btn {
+    margin-top:5%;
+    padding-left: -5px;
+  }
+}
+
+@media (min-width: 800px) {
+  .card {
+    width: 49%;
+  }
+  .heading {
+    font-size: 3em;
+  }
+  .searchbox {
+    width: 75%;
+  }
+
+  .welcome {
+    .subheading {
+      font-size: 1em;
+      width: 75%;
+      margin: 0 auto;
+    }
+  }
+}
+
+
+@media (min-width: 1100px) {
+  .searchbox {
+    width: 60%;
+  }
+
+  .welcome {
+    .subheading {
+      font-size: 1.1em;
+    }
+  }
+}
