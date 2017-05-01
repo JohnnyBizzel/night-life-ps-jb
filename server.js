@@ -28,7 +28,8 @@ const db = mongoose.connect('mongodb://' + userpass + '@ds051893.mlab.com:51893/
 // App Setup
 app.use(morgan('combined'));
 app.use(cors());
-app.use(bodyParser.json({ type: '*/*' }));
+app.use(bodyParser.json({ type: '*/*' })); // handle json data
+app.use(bodyParser.urlencoded({ extended: true })) // handle URL-encoded data
 
 app.use(express.static(__dirname));
 // normal routes
@@ -46,9 +47,10 @@ app.use(express.static(__dirname));
   app.post('/api/signup', Authentication.signup);
 
   //add/remove businesses to user account
-  app.post('/api/businesses', requireAuth, reservation.addReservation) 
+  app.get('/api/businessp', requireAuth, reservation.addReservation) 
   app.delete('/api/businesses', requireAuth, reservation.removeReservation) 
-  app.get('/api/businesses', requireAuth, reservation.getReservations)  
+  app.get('/api/businesses', requireAuth, reservation.getReservations) 
+  app.post('/api/business', requireAuth, reservation.updateReservation) 
   app.post('/api/allreservations', reservation.getAllReservationsFromYelpCall) 
 
   // access yelp api
@@ -56,7 +58,9 @@ app.use(express.static(__dirname));
 
   // get current logged in user id
   app.get('/api/me', requireAuth,
-    function(req, res) {
+    function(req, res, err) {
+      if (err) console.log(err);
+      console.log(req.user);
       res.json(req.user);
   });
 

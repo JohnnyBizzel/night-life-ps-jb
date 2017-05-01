@@ -10,6 +10,7 @@ import {
   FETCH_YELP,
   FETCH_RSVP,
   ADD_RSVP,
+  UPDATE_RSVP,
   DELETE_RSVP,
   FETCH_WHOSGOING,
   SORTED_WHOSGOING
@@ -22,7 +23,6 @@ const xi = 0;
 export function handleUserAuthentication(signinType, {email, password, firstname, lastname}) {
     return function(dispatch) {
     // Submit email/password to the server
-      console.log('sign in handler: ', signinType);
     return axios.post(`${ROOT_URL}/api/${signinType}`, { email, password, firstname, lastname })
       .then(response => {
         // If request is good...
@@ -60,7 +60,7 @@ export function signoutUser() {
 
 export function fetchMessage() {
   return function(dispatch) {
-    console.log('MSG: the url found was: ', config.url)
+
     axios.get(ROOT_URL, {
       headers: { authorization: localStorage.getItem('token') }
     })
@@ -75,7 +75,6 @@ export function fetchMessage() {
 
 export function fetchUser() {
   if (localStorage.getItem('token')) {
-    console.log('USR: the url found was: ', config.url)
     const url = `${ROOT_URL}/api/me`
 
     return function(dispatch) {
@@ -90,6 +89,7 @@ export function fetchUser() {
         });
       }   
   } else {
+    console.log('no token')
     return function(dispatch) {
       dispatch({
         type: FETCH_USER,
@@ -102,7 +102,6 @@ export function fetchUser() {
 
 export function fetchYelp(city, userid) {
   const url = `${ROOT_URL}/openapi/yelp?location=${city}&userid=${userid}`
-
     return function(dispatch) {
     return axios.get(url, {
       headers: { authorization: localStorage.getItem('token') }
@@ -133,11 +132,11 @@ export function fetchRSVP(businessID) {
 }
 
 export function addRSVP(businessID) {
-  const url = `${ROOT_URL}/api/businesses`
-
+  const url = `${ROOT_URL}/api/businessp?id=${businessID}`
+// {id: businessID} {"id": `${businessID}`}, 
   return function(dispatch) {
-    return axios.post(url, {id: businessID} , {
-      headers: { authorization: localStorage.getItem('token') }
+    return axios.get(url,  {
+      headers: { 'authorization': localStorage.getItem('token'), 'Content-Type': 'application/json' }
     })
       .then(response => {
         dispatch({
@@ -156,16 +155,17 @@ export function getAllReservationsFromYelpList(ids) {
       headers: { authorization: localStorage.getItem('token') }
     })
       .then(response => {
+      console.log(response);
         dispatch({
           type: FETCH_WHOSGOING,
           payload: response
-        });1
+        });
       });
   }
 }
 
 export function updateReservations(yelpData, whosGoing) {
-  
+  // creates a sorted list of businesses (null if no one is going)
   let arr = []
   let whosGoingArr = whosGoing.concat()
   yelpData.forEach(business =>{
@@ -184,6 +184,9 @@ export function updateReservations(yelpData, whosGoing) {
   };
 }
 
+
+// Changed!! This will remove the business record rather than leaving 
+// a record with an empty list of reservations
 export function deleteRSVP(businessID) {
   const url = `${ROOT_URL}/api/businesses`
 
@@ -194,6 +197,25 @@ export function deleteRSVP(businessID) {
       .then(response => {
         dispatch({
           type: DELETE_RSVP,
+          payload: response
+        });
+      });
+  }
+}
+
+export function removeOneRSVP(businessID, whosGoing) {
+  const url = `${ROOT_URL}/api/business`
+
+  return function(dispatch) {
+    return axios({method: 'post', 
+                  url: `${url}`, 
+                  data: {  id: businessID,
+                          rsvps: whosGoing },
+                  headers: { authorization: localStorage.getItem('token') }
+    })
+      .then(response => {
+        dispatch({
+          type: UPDATE_RSVP,
           payload: response
         });
       });
