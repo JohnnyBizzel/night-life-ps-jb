@@ -48,7 +48,7 @@ export default class Examples extends Component {
                         <ul className = 'list-group' >
                             {this.renderWhosGoingList(this.props.users)}
                         </ul>   
-                        <a className="btn btn-primary" href="javascript:void(0);" onClick={() => this.closeModal()}>Close</a>
+                        &emsp;<button className="btn btn-primary"  onClick={() => this.closeModal()}>Close</button>
                     </div>
                 </Modal>
             </div>

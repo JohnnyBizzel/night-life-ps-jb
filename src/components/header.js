@@ -25,7 +25,7 @@ class Header extends Component {
   render() {
     return (
       <nav className="navbar navbar-light header-component">
-        <Link to="/" className="navbar-brand">Nightlife</Link>
+        <Link to="/" className="navbar-brand">Nightlife</Link>      
         <ul className="nav navbar-nav">
           {this.renderLinks()}
         </ul>
@@ -36,7 +36,8 @@ class Header extends Component {
 
 function mapStateToProps(state) {
   return {
-    authenticated: state.auth.authenticated
+    authenticated: state.auth.authenticated,
+    user: state.user
   };
 }
 

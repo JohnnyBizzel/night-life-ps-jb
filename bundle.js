@@ -30967,7 +30967,8 @@
 
 	function mapStateToProps(state) {
 	  return {
-	    authenticated: state.auth.authenticated
+	    authenticated: state.auth.authenticated,
+	    user: state.user
 	  };
 	}
 
@@ -34224,6 +34225,7 @@
 	exports.getAllReservationsFromYelpList = getAllReservationsFromYelpList;
 	exports.updateReservations = updateReservations;
 	exports.deleteRSVP = deleteRSVP;
+	exports.removeOneRSVP = removeOneRSVP;
 
 	var _axios = __webpack_require__(329);
 
@@ -34251,7 +34253,6 @@
 
 	  return function (dispatch) {
 	    // Submit email/password to the server
-	    console.log('sign in handler: ', signinType);
 	    return _axios2.default.post(ROOT_URL + '/api/' + signinType, { email: email, password: password, firstname: firstname, lastname: lastname }).then(function (response) {
 	      // If request is good...
 	      // - Update state to indicate user is authenticated
@@ -34287,7 +34288,7 @@
 
 	function fetchMessage() {
 	  return function (dispatch) {
-	    console.log('MSG: the url found was: ', _config2.default.url);
+
 	    _axios2.default.get(ROOT_URL, {
 	      headers: { authorization: localStorage.getItem('token') }
 	    }).then(function (response) {
@@ -34301,7 +34302,6 @@
 
 	function fetchUser() {
 	  if (localStorage.getItem('token')) {
-	    console.log('USR: the url found was: ', _config2.default.url);
 	    var url = ROOT_URL + '/api/me';
 
 	    return function (dispatch) {
@@ -34315,6 +34315,7 @@
 	      });
 	    };
 	  } else {
+	    console.log('no token');
 	    return function (dispatch) {
 	      dispatch({
 	        type: _types.FETCH_USER,
@@ -34326,7 +34327,6 @@
 
 	function fetchYelp(city, userid) {
 	  var url = ROOT_URL + '/openapi/yelp?location=' + city + '&userid=' + userid;
-
 	  return function (dispatch) {
 	    return _axios2.default.get(url, {
 	      headers: { authorization: localStorage.getItem('token') }
@@ -34355,11 +34355,11 @@
 	}
 
 	function addRSVP(businessID) {
-	  var url = ROOT_URL + '/api/businesses';
-
+	  var url = ROOT_URL + '/api/businessp?id=' + businessID;
+	  // {id: businessID} {"id": `${businessID}`}, 
 	  return function (dispatch) {
-	    return _axios2.default.post(url, { id: businessID }, {
-	      headers: { authorization: localStorage.getItem('token') }
+	    return _axios2.default.get(url, {
+	      headers: { 'authorization': localStorage.getItem('token'), 'Content-Type': 'application/json' }
 	    }).then(function (response) {
 	      dispatch({
 	        type: _types.ADD_RSVP,
@@ -34386,7 +34386,7 @@
 	}
 
 	function updateReservations(yelpData, whosGoing) {
-
+	  // creates a sorted list of businesses (null if no one is going)
 	  var arr = [];
 	  var whosGoingArr = whosGoing.concat();
 	  yelpData.forEach(function (business) {
@@ -34427,6 +34427,8 @@
 	  };
 	}
 
+	// Changed!! This will remove the business record rather than leaving 
+	// a record with an empty list of reservations
 	function deleteRSVP(businessID) {
 	  var url = ROOT_URL + '/api/businesses';
 
@@ -34436,6 +34438,24 @@
 	    }).then(function (response) {
 	      dispatch({
 	        type: _types.DELETE_RSVP,
+	        payload: response
+	      });
+	    });
+	  };
+	}
+
+	function removeOneRSVP(businessID, whosGoing) {
+	  var url = ROOT_URL + '/api/business';
+
+	  return function (dispatch) {
+	    return (0, _axios2.default)({ method: 'post',
+	      url: '' + url,
+	      data: { id: businessID,
+	        rsvps: whosGoing },
+	      headers: { authorization: localStorage.getItem('token') }
+	    }).then(function (response) {
+	      dispatch({
+	        type: _types.UPDATE_RSVP,
 	        payload: response
 	      });
 	    });
@@ -35559,9 +35579,10 @@
 	var FETCH_USER = exports.FETCH_USER = 'fetch_user';
 	var FETCH_MESSAGE = exports.FETCH_MESSAGE = 'fetch_message';
 	var FETCH_YELP = exports.FETCH_YELP = 'fetch_yelp';
-	var FETCH_RSVP = exports.FETCH_RSVP = 'fetch_RSVP';
-	var ADD_RSVP = exports.ADD_RSVP = 'add_RSVP';
-	var DELETE_RSVP = exports.DELETE_RSVP = 'delete_RSVP';
+	var FETCH_RSVP = exports.FETCH_RSVP = 'fetch_rsvp';
+	var ADD_RSVP = exports.ADD_RSVP = 'add_rsvp';
+	var UPDATE_RSVP = exports.UPDATE_RSVP = 'update_rsvp';
+	var DELETE_RSVP = exports.DELETE_RSVP = 'delete_rsvp';
 	var FETCH_WHOSGOING = exports.FETCH_WHOSGOING = 'fetch_whosgoing';
 	var SORTED_WHOSGOING = exports.SORTED_WHOSGOING = 'sorted_whosgoing';
 
@@ -36072,9 +36093,7 @@
 	    var _this = _possibleConstructorReturn(this, (YelpList.__proto__ || Object.getPrototypeOf(YelpList)).call(this, props));
 
 	    _this.state = {
-	      whosGoing: [],
-	      isUserGoing: false,
-	      isOpen: false
+	      whosGoing: []
 	    };
 	    return _this;
 	  }
@@ -36082,20 +36101,29 @@
 	  _createClass(YelpList, [{
 	    key: 'componentWillMount',
 	    value: function componentWillMount() {
-	      // fetch logged in user data from api
-	      this.props.fetchUser();
+	      this.props.fetchUser(); // moved back here as I was having problems with the promise when not logged in
+	      console.log("component will mount");
 	    }
 	  }, {
 	    key: 'componentDidMount',
 	    value: function componentDidMount() {
 	      // fetches data from yelp open api
-	      var term = this.props.user[0] !== undefined ? this.props.user[0].lastsearch : 'london';
-	      var user = this.props.user[0] !== undefined ? this.props.user[0]._id : "";
-	      this.getData(this.props.fetchYelp, term, user);
+	      console.log("component did mount");
+	      //this.props.fetchUser().then(() => {
+	      var term = 'London';
+	      var userId = '';
+	      if (this.props.user) {
+	        term = this.props.user[0] !== undefined ? this.props.user[0].lastsearch : 'london';
+	        userId = this.props.user[0] !== undefined ? this.props.user[0]._id : "";
+	      }
+
+	      this.getData(this.props.fetchYelp, term, userId);
+	      //});
 	    }
 	  }, {
 	    key: 'componentWillReceiveProps',
 	    value: function componentWillReceiveProps(nextProps) {
+	      console.log("component will rec props");
 	      if (nextProps.sortedWhosGoing) {
 	        if (nextProps.sortedWhosGoing !== this.props.sortedWhosGoing) {
 	          this.setState({ whosGoing: nextProps.sortedWhosGoing });
@@ -36104,14 +36132,18 @@
 	    }
 	  }, {
 	    key: 'getData',
-	    value: function getData(dataType, city) {
+	    value: function getData(dataType, city, userId) {
 	      var _this2 = this;
 
-	      dataType(city).then(function () {
+	      console.log("getData:", city);
+	      console.log("user ID:", userId);
+	      dataType(city, userId).then(function () {
 	        var ids = _this2.props.yelpListings[0].jsonBody.businesses.map(function (business) {
 	          return business.id;
 	        });
 	        _this2.props.getAllReservationsFromYelpList(ids).then(function () {
+	          // after getting the businesses from the Yelp API, find any which are in our Db.
+	          // then match these with the order of items on the page
 	          _this2.props.updateReservations(_this2.props.yelpListings[0].jsonBody.businesses, _this2.props.whosGoing);
 	          _this2.setState({
 	            whosGoing: _this2.props.sortedWhosGoing
@@ -36139,18 +36171,48 @@
 	        });
 	      });
 	    }
+
+	    // Add or remove RSVP
+
 	  }, {
 	    key: 'onClickSubmit',
-	    value: function onClickSubmit(index, businessID, event, toggle) {
+	    value: function onClickSubmit(index, businessID, event, userIsGoing) {
 	      var _this4 = this;
 
 	      event.preventDefault();
-
-	      if (toggle) {
-	        this.props.deleteRSVP(businessID).then(function () {
-	          _this4.updateWhosGoing(index, businessID);
+	      console.log("user is going:", userIsGoing);
+	      if (userIsGoing) {
+	        console.log("del RSVP:", businessID);
+	        console.log(this.props.whosGoing);
+	        var resForBusiness = 0;
+	        var curRes = []; // current reservations
+	        var allReservations = this.props.whosGoing;
+	        allReservations.forEach(function (bus) {
+	          if (bus.id === businessID) {
+	            resForBusiness = bus.user_reservations.length;
+	            if (resForBusiness > 0) {
+	              // check if current user is in reservation array and remove
+	              curRes = bus.user_reservations;
+	              curRes = curRes.filter(function (ur) {
+	                return ur.email != _this4.props.user[0].email;
+	              });
+	            }
+	          }
 	        });
+	        console.log('Num other reservations: ', resForBusiness);
+	        if (resForBusiness > 0) {
+	          // modify the user_reservations array 
+	          this.props.removeOneRSVP(businessID, curRes).then(function () {
+	            _this4.updateWhosGoing(index, businessID);
+	          });
+	        } else {
+	          // delete this business from the db
+	          this.props.deleteRSVP(businessID).then(function () {
+	            _this4.updateWhosGoing(index, businessID);
+	          });
+	        }
 	      } else {
+	        console.log("add RSVP:", businessID);
 	        this.props.addRSVP(businessID).then(function () {
 	          _this4.updateWhosGoing(index, businessID);
 	        });
@@ -36158,23 +36220,24 @@
 	    }
 	  }, {
 	    key: 'renderListing',
-	    value: function renderListing(data) {
+	    value: function renderListing(data, userIsLoggedIn) {
 	      var _this5 = this;
 
 	      return data.map(function (yelpData, idx) {
-	        var val = [],
+	        var usersWhoAreGoing = [],
 	            users = [];
-	        var toggle = false;
+	        var userIsGoing = false;
 
 	        if (_this5.state.whosGoing[idx]) {
 	          users = _this5.state.whosGoing[idx].user_reservations;
-	          val = _this5.state.whosGoing[idx].user_reservations.map(function (item) {
-	            return item._id;
+	          usersWhoAreGoing = _this5.state.whosGoing[idx].user_reservations.map(function (item) {
+	            return item.email;
 	          });
 	        }
 
-	        if (_this5.props.user[0]) {
-	          toggle = val.includes(_this5.props.user[0]._id);
+	        if (userIsLoggedIn) {
+	          //console.log("Render listing Curr user:", this.props.user[0])
+	          userIsGoing = usersWhoAreGoing.includes(_this5.props.user[0].email);
 	        }
 
 	        return _react2.default.createElement(
@@ -36211,16 +36274,16 @@
 	              ', ',
 	              yelpData.location.zip_code
 	            ),
-	            _this5.props.user[0] === undefined ? _react2.default.createElement(
+	            !userIsLoggedIn ? _react2.default.createElement(
 	              _reactRouter.Link,
 	              { className: 'btn btn-primary', to: '/signin' },
 	              'Sign in to RSVP'
 	            ) : _react2.default.createElement(
 	              'a',
 	              { href: '#', className: 'btn btn-primary', onClick: function onClick(e) {
-	                  return _this5.onClickSubmit(idx, yelpData.id, e, toggle);
+	                  return _this5.onClickSubmit(idx, yelpData.id, e, userIsGoing);
 	                } },
-	              toggle ? "Remove RSVP" : "Add RSVP"
+	              userIsGoing ? "Remove RSVP" : "Add RSVP"
 	            ),
 	            users.length > 0 ? _react2.default.createElement(_whosgoing_modal2.default, { users: users }) : _react2.default.createElement(
 	              'span',
@@ -36234,7 +36297,11 @@
 	  }, {
 	    key: 'render',
 	    value: function render() {
-	      console.log(this.props.user);
+	      //console.log('Rendering, user:', this.props.user)
+	      var gotUser = false;
+	      if (this.props.user) {
+	        if (this.props.user[0] !== undefined) gotUser = true;
+	      }
 	      if (this.props.yelpListings.length < 1) {
 	        return _react2.default.createElement(
 	          'div',
@@ -36248,10 +36315,16 @@
 	        'div',
 	        null,
 	        _react2.default.createElement('br', null),
+	        gotUser ? _react2.default.createElement(
+	          'span',
+	          null,
+	          'Hi, ',
+	          this.props.user[0].firstname
+	        ) : _react2.default.createElement('br', null),
 	        _react2.default.createElement(
 	          'div',
 	          { className: 'd-flex flex-wrap justify-content-between yelp-list' },
-	          this.renderListing(this.props.yelpListings[0].jsonBody.businesses)
+	          this.renderListing(this.props.yelpListings[0].jsonBody.businesses, gotUser)
 	        )
 	      );
 	    }
@@ -36261,6 +36334,7 @@
 	}(_react.Component);
 
 	function mapStateToProps(state) {
+	  console.log('YelpList mapping state to props:', state);
 	  return { message: state.auth.message,
 	    yelpListings: state.yelpListings,
 	    sampleData: state.sampleData,
@@ -36392,9 +36466,10 @@
 	                            { className: 'list-group' },
 	                            this.renderWhosGoingList(this.props.users)
 	                        ),
+	                        '\u2003',
 	                        _react2.default.createElement(
-	                            'a',
-	                            { className: 'btn btn-primary', href: 'javascript:void(0);', onClick: function onClick() {
+	                            'button',
+	                            { className: 'btn btn-primary', onClick: function onClick() {
 	                                    return _this2.closeModal();
 	                                } },
 	                            'Close'
@@ -36971,9 +37046,9 @@
 
 	var _rsvp_reducer2 = _interopRequireDefault(_rsvp_reducer);
 
-	var _sampleData_reducer = __webpack_require__(366);
+	var _sampledata_reducer = __webpack_require__(366);
 
-	var _sampleData_reducer2 = _interopRequireDefault(_sampleData_reducer);
+	var _sampledata_reducer2 = _interopRequireDefault(_sampledata_reducer);
 
 	var _user_reducer = __webpack_require__(367);
 
@@ -36987,7 +37062,7 @@
 	  auth: _auth_reducer2.default,
 	  yelpListings: _yelp_reducer2.default,
 	  rsvp: _rsvp_reducer2.default,
-	  sampleData: _sampleData_reducer2.default,
+	  sampleData: _sampledata_reducer2.default,
 	  user: _user_reducer2.default
 	});
 
@@ -37041,14 +37116,17 @@
 
 	  switch (action.type) {
 	    case _types.FETCH_YELP:
-	      return [action.payload.data].concat(_toConsumableArray(state));
+	      // let newState = new Object
+	      // newState = Object.assign({},state); 
+	      // if (action.payload.data){
+	      //   newState3.whosGoing = action.payload.data;
+	      // }
+	      return [action.payload.data];
 	  }
 	  return state;
 	};
 
 	var _types = __webpack_require__(347);
-
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 /***/ }),
 /* 365 */
@@ -37059,6 +37137,8 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 	exports.default = function () {
 	  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
@@ -37071,11 +37151,13 @@
 	      newState.fetch = action.payload.data;
 	      return newState;
 	    case _types.ADD_RSVP:
-	      var newState2 = new Object();
-	      newState2 = Object.assign({}, state);
-	      newState2.whosGoing.push(action.payload.data);
-	      return newState2;
-	    //return { add: action.payload.data, ...state }
+	      // let newState2 = new Object
+	      // newState2 = Object.assign({},state); 
+	      // newState2.add = [];
+	      // // payload arrives "error occured"
+	      // newState2.add.push(action.payload.data);
+	      //return newState2;
+	      return _extends({ add: action.payload.data }, state);
 	    case _types.FETCH_WHOSGOING:
 	      var newState3 = new Object();
 	      newState3 = Object.assign({}, state);
