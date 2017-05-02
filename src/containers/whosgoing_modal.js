@@ -26,7 +26,7 @@ export default class Examples extends Component {
         return data.map((data, idx) => {
             return (
                 <li className ='list-group-item' key ={idx}>
-                    {data.firstname} {data.lastname}, <a href={`mailto: ${data.email}`}>E-Mail</a>
+                    {data.firstname} {data.lastname} <a href={`mailto: ${data.email}`}><i className="fa fa-envelope" aria-hidden="true"></i></a>
                 </li>
             )
         })

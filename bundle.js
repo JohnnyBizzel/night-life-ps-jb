@@ -28321,7 +28321,7 @@
 
 
 	// module
-	exports.push([module.id, "body { padding: 0 }\n\n.error {\n  color: red;\n}\n\nul.nav.navbar-nav {\n  flex-direction: row;\n} \n\nul.nav.navbar-nav li {\n    margin: 5px;\n  }\n\n.test {\n  color: red;\n}\n\n.going {\n  margin-left: 5px;\n}\n\n.navbar-brand {\n  font-family: Lobster;\n}\n\n.heading {\n  font-size: 2em;\n}\n\n.title {\n  font-family: Lobster;\n  padding: 15px;\n}\n\n.subheading {\n  font-size: 1.5em;\n  padding: 20px;\n}\n\n.yelp-list {\n  width: 100%;\n}\n\n.card {\n  width: 100%;\n  margin: 3px;\n}\n.nogo-message {\n  color: slategray;\n}\n\n.welcome.appname {\n    font-family: lobster;\n  }\n.welcome.subheading {\n    font-size: 0.9em;\n} \n\n.searchbox {\n  width: 100%;\n  margin: 0 auto;\n}\n\n.whosgoing{\n  display:inline-block;\n}\n  \n.whosgoing.whosgoing-modal {\n    padding: 5px;\n  }\n  .whosgoing h2 {\n    font-family: Lobster;\n  }\n  .whosgoing.btn {\n    margin-top:5%;\n    padding-left: -5px;\n  }\n\n@media (min-width: 800px) {\n  .card {\n    width: 49%;\n  }\n  .heading {\n    font-size: 3em;\n  }\n  .searchbox {\n    width: 75%;\n  }\n\n \n  .welcome.subheading {\n      font-size: 1em;\n      width: 75%;\n      margin: 0 auto;\n    }\n  \n}\n\n\n@media (min-width: 1100px) {\n  .searchbox {\n    width: 60%;\n  }\n\n  \n   .welcome .subheading {\n      font-size: 1.1em;\n    }\n  \n}", ""]);
+	exports.push([module.id, "body { padding: 0 }\n\n.error {\n  color: red;\n}\n\nul.nav.navbar-nav {\n  flex-direction: row;\n} \n\nul.nav.navbar-nav li {\n    margin: 5px;\n  }\n\n.test {\n  color: red;\n}\n\n.going {\n  margin-left: 5px;\n}\n\n.navbar-brand {\n  font-family: Lobster;\n}\n\n.heading {\n  font-size: 2em;\n}\n\n.title {\n  font-family: Lobster;\n  padding: 15px;\n}\n\n.subheading {\n  font-size: 1.5em;\n  padding: 20px;\n}\n\n.yelp-list {\n  width: 100%;\n}\n\n.card {\n  width: 100%;\n  margin: 3px;\n}\n.nogo-message {\n  color: slategray;\n}\n\n.welcome.appname {\n    font-family: lobster;\n  }\n.welcome.subheading {\n    font-size: 0.9em;\n} \n\n.searchbox {\n  width: 100%;\n  margin: 0 auto;\n}\n\n.whosgoing{\n  display:inline-block;\n}\n  \n.whosgoing.whosgoing-modal {\n    padding: 5px;\n  }\n  .whosgoing h2 {\n    font-family: Lobster;\n  }\n  .whosgoing.btn {\n    margin-top:5%;\n    padding-left: -5px;\n  }\n\n@media (min-width: 800px) {\n  .card {\n    width: 31%;\n  }\n  .heading {\n    font-size: 3em;\n  }\n  .searchbox {\n    width: 75%;\n  }\n\n \n  .welcome.subheading {\n      font-size: 1em;\n      width: 78%;\n      margin: 0 auto;\n    }\n  \n}\n\n\n@media (min-width: 1100px) {\n  .searchbox {\n    width: 60%;\n  }\n\n  \n   .welcome .subheading {\n      font-size: 1.1em;\n    }\n  \n}", ""]);
 
 	// exports
 
@@ -36109,7 +36109,7 @@
 	    value: function componentDidMount() {
 	      // fetches data from yelp open api
 	      console.log("component did mount");
-	      //this.props.fetchUser().then(() => {
+
 	      var term = 'London';
 	      var userId = '';
 	      if (this.props.user) {
@@ -36118,7 +36118,6 @@
 	      }
 
 	      this.getData(this.props.fetchYelp, term, userId);
-	      //});
 	    }
 	  }, {
 	    key: 'componentWillReceiveProps',
@@ -36200,13 +36199,13 @@
 	          }
 	        });
 	        console.log('Num other reservations: ', resForBusiness);
-	        if (resForBusiness > 0) {
+	        if (resForBusiness > 1) {
 	          // modify the user_reservations array 
 	          this.props.removeOneRSVP(businessID, curRes).then(function () {
 	            _this4.updateWhosGoing(index, businessID);
 	          });
 	        } else {
-	          // delete this business from the db
+	          // delete this business from the db - this user is the only one who goes
 	          this.props.deleteRSVP(businessID).then(function () {
 	            _this4.updateWhosGoing(index, businessID);
 	          });
@@ -36261,8 +36260,9 @@
 	            _react2.default.createElement(
 	              'p',
 	              { className: 'card-text' },
-	              'Rating (out of 5): ',
-	              yelpData.rating
+	              'Yelp Rating: (',
+	              yelpData.rating,
+	              '/5)'
 	            ),
 	            _react2.default.createElement(
 	              'p',
@@ -36280,7 +36280,8 @@
 	              'Sign in to RSVP'
 	            ) : _react2.default.createElement(
 	              'a',
-	              { href: '#', className: 'btn btn-primary', onClick: function onClick(e) {
+	              { href: '#', className: 'btn btn-primary',
+	                onClick: function onClick(e) {
 	                  return _this5.onClickSubmit(idx, yelpData.id, e, userIsGoing);
 	                } },
 	              userIsGoing ? "Remove RSVP" : "Add RSVP"
@@ -36288,7 +36289,7 @@
 	            users.length > 0 ? _react2.default.createElement(_whosgoing_modal2.default, { users: users }) : _react2.default.createElement(
 	              'span',
 	              { className: 'nogo-message' },
-	              ' No one\'s going tonight'
+	              ' No one is going'
 	            )
 	          )
 	        );
@@ -36415,11 +36416,11 @@
 	                    data.firstname,
 	                    ' ',
 	                    data.lastname,
-	                    ', ',
+	                    ' ',
 	                    _react2.default.createElement(
 	                        'a',
 	                        { href: 'mailto: ' + data.email },
-	                        'E-Mail'
+	                        _react2.default.createElement('i', { className: 'fa fa-envelope', 'aria-hidden': 'true' })
 	                    )
 	                );
 	            });
@@ -36975,7 +36976,7 @@
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
-	                      value: true
+	  value: true
 	});
 
 	var _react = __webpack_require__(2);
@@ -36993,31 +36994,26 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	exports.default = function () {
-	                      return _react2.default.createElement(
-	                                            'div',
-	                                            { className: 'welcome' },
-	                                            _react2.default.createElement(
-	                                                                  'div',
-	                                                                  { className: 'heading text-center' },
-	                                                                  'Welcome to the ',
-	                                                                  _react2.default.createElement(
-	                                                                                        'span',
-	                                                                                        { className: 'appname' },
-	                                                                                        'Nightlife App'
-	                                                                  )
-	                                            ),
-	                                            _react2.default.createElement(
-	                                                                  'div',
-	                                                                  { className: 'subheading text-center' },
-	                                                                  _react2.default.createElement(
-	                                                                                        'i',
-	                                                                                        null,
-	                                                                                        'Search a location for restaurants near you and signup to let others know you plan to visit'
-	                                                                  )
-	                                            ),
-	                                            _react2.default.createElement(_search_bar2.default, null),
-	                                            _react2.default.createElement(_yelp_list2.default, null)
-	                      );
+	  return _react2.default.createElement(
+	    'div',
+	    { className: 'welcome' },
+	    _react2.default.createElement(
+	      'div',
+	      { className: 'heading text-center' },
+	      'The Night Life Co-ordinator App'
+	    ),
+	    _react2.default.createElement(
+	      'div',
+	      { className: 'subheading text-center' },
+	      _react2.default.createElement(
+	        'i',
+	        null,
+	        'Search a location for restaurants near you, then sign up or log in to let others know you plan to visit'
+	      )
+	    ),
+	    _react2.default.createElement(_search_bar2.default, null),
+	    _react2.default.createElement(_yelp_list2.default, null)
+	  );
 	};
 
 /***/ }),

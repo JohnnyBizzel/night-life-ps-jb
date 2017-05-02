@@ -18,7 +18,7 @@ class YelpList extends Component {
   }
   componentDidMount() { // fetches data from yelp open api
     console.log("component did mount");
-    //this.props.fetchUser().then(() => {
+    
       let term = 'London';
       let userId = '';
       if (this.props.user) {
@@ -27,7 +27,6 @@ class YelpList extends Component {
       }
       
       this.getData(this.props.fetchYelp, term, userId)
-    //});
     
   }
 
@@ -96,13 +95,13 @@ class YelpList extends Component {
         }
       })
       console.log('Num other reservations: ', resForBusiness)
-      if (resForBusiness > 0) {
+      if (resForBusiness > 1) {
         // modify the user_reservations array 
         this.props.removeOneRSVP(businessID, curRes).then(() => {
           this.updateWhosGoing(index, businessID)
         })
       } else {
-        // delete this business from the db
+        // delete this business from the db - this user is the only one who goes
         this.props.deleteRSVP(businessID).then(() => {
           this.updateWhosGoing(index, businessID)
         })
@@ -137,13 +136,15 @@ class YelpList extends Component {
         <img className="card-img-top" src={(yelpData.image_url).replace('o.jpg','348s.jpg')} alt={yelpData.name} />
         <div className="card-block">
           <a href={yelpData.url} target="_blank"><h4 className="card-title">{yelpData.name} <i className="fa fa-external-link" aria-hidden="true"></i></h4></a>
-          <p className="card-text">Rating (out of 5): {yelpData.rating}</p>
+          <p className="card-text">Yelp Rating: ({yelpData.rating}/5)</p>
           <p className="card-text">Location: {yelpData.location.address1}, {yelpData.location.city}, {yelpData.location.zip_code}</p>
           {!userIsLoggedIn ? 
             <Link className="btn btn-primary" to="/signin">Sign in to RSVP</Link> : 
-            <a href="#" className="btn btn-primary" onClick={(e)=> this.onClickSubmit(idx, yelpData.id, e, userIsGoing)}>{userIsGoing ? "Remove RSVP" : "Add RSVP" }</a>
+            <a href="#" className="btn btn-primary"
+                    onClick={(e)=> this.onClickSubmit(idx, yelpData.id, e, userIsGoing)}>
+                    {userIsGoing ? "Remove RSVP" : "Add RSVP" }</a>
           }
-          {users.length > 0 ? <WhosGoingModal users={users}/> : <span className="nogo-message"> No one's going tonight</span>}
+          {users.length > 0 ? <WhosGoingModal users={users}/> : <span className="nogo-message"> No one is going</span>}
         </div>
       </div>
       );

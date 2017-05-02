@@ -79,7 +79,7 @@ ul.nav.navbar-nav li {
 
 @media (min-width: 800px) {
   .card {
-    width: 49%;
+    width: 31%;
   }
   .heading {
     font-size: 3em;
@@ -91,7 +91,7 @@ ul.nav.navbar-nav li {
  
   .welcome.subheading {
       font-size: 1em;
-      width: 75%;
+      width: 78%;
       margin: 0 auto;
     }
   
