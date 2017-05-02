@@ -1,6 +1,6 @@
 {
   "name": "nightlife-co-ordinator-client",
-  "version": "1.0.888",
+  "version": "1.0.889",
   "description": "Night life co-ordinator app client and server combined (FCC challenge)",
   "main": "index.js",
   "repository": {
@@ -11,7 +11,7 @@
     "start": "node server.js",
     "postinstall": "webpack"
   },
-  "author": "John Barber, Parminder Sanghera, boilerplate code c/oStephen Grider",
+  "author": "John Barber, Parminder Sanghera, boilerplate code c/o Stephen Grider",
   "license": "ISC",
   "devDependencies": {
     "babel-core": "^6.24.1",
