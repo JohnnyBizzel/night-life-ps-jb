@@ -8,7 +8,6 @@ class Signin extends Component {
     // Need to do something to log user in
     this.props.handleUserAuthentication('signin', {email, password}).then(() => {
       this.props.fetchUser().then(()=>{
-        // - redirect to the route '/feature'
         browserHistory.push('/feature');
       })
     })  

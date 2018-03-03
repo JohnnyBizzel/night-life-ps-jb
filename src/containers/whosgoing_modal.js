@@ -29,7 +29,7 @@ export default class Examples extends Component {
                     {data.firstname} {data.lastname} <a href={`mailto: ${data.email}`}><i className="fa fa-envelope" aria-hidden="true"></i></a>
                 </li>
             )
-        })
+        });
     }
 
     render() {

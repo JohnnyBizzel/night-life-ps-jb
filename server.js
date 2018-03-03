@@ -35,13 +35,6 @@ app.use(express.static(__dirname));
 // normal routes
 
 
-
-
-//var router = express.Router();
-// server routes
- // app.get('/', requireAuth, function(req, res) {
- //    res.send({ message: 'Super secret code is ABC123' });
- //  });
   // signin and out
   app.post('/api/signin', requireSignin, Authentication.signin);
   app.post('/api/signup', Authentication.signup);

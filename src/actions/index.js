@@ -31,8 +31,6 @@ export function handleUserAuthentication(signinType, {email, password, firstname
         // - Save the JWT token
         localStorage.setItem('token', response.data.token);
       })
-      // If request is bad...
-      // - Show an error to the user
       .catch((response) => {
           if (response.status === 400) {
             dispatch(authError('Bad request'))
@@ -92,7 +90,7 @@ export function fetchUser() {
     console.log('no token')
     return function(dispatch) {
       dispatch({
-        type: FETCH_USER,
+        type: FETCH_USER, 
         payload: []
       });  
     }
@@ -100,11 +98,26 @@ export function fetchUser() {
 
 }
 
+// export function fetchYelp(city, userid) {
+//   const url = `${ROOT_URL}/openapi/yelp?location=${city}&userid=${userid}`
+//     return function(dispatch) {
+//     return axios.get(url, {
+//       headers: { authorization: localStorage.getItem('token') }
+//     })
+//       .then(response => {
+//         dispatch({
+//           type: FETCH_YELP,
+//           payload: response
+//         });
+//       });
+//   }
+// }
+
 export function fetchYelp(city, userid) {
   const url = `${ROOT_URL}/openapi/yelp?location=${city}&userid=${userid}`
     return function(dispatch) {
     return axios.get(url, {
-      headers: { authorization: localStorage.getItem('token') }
+      headers: { authorization: process.env.YELP_API }
     })
       .then(response => {
         dispatch({
