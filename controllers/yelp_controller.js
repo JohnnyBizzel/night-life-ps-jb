@@ -5,16 +5,15 @@ const passport = require('passport');
 function yelpResults(req, res) {
   const yelp = require('yelp-fusion');
   const ObjectId = require('mongoose').Types.ObjectId
-
-  yelp.accessToken(process.env.CLIENT_ID, process.env.CLIENT_SECRET).then(function(response) {
-    const client = yelp.client(response.jsonBody.access_token);
-
-    client.search({
-      term:'Food',
-      location: req.query.location
-    }).then(function(response) {
-      res.json(response);;
-    });
+  // This method was depricated 1 March 2018
+  // ---------------------------------------
+//yelp.accessToken(process.env.CLIENT_ID, process.env.CLIENT_SECRET).then(function(response) {
+ // yelp.accessToken(process.env.YELP_API).then(function(response) {
+  yelp.client(process.env.YELP_API).search({
+    term:'Food',
+    location: req.query.location
+  }).then(function(response) {
+    res.json(response);
   }).catch(function(e) {
     res.json(e);
   });

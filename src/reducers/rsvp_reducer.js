@@ -8,12 +8,6 @@ export default function(state={}, action) {
       newState.fetch = action.payload.data;
       return newState;
     case ADD_RSVP: 
-      // let newState2 = new Object
-      // newState2 = Object.assign({},state); 
-      // newState2.add = [];
-      // // payload arrives "error occured"
-      // newState2.add.push(action.payload.data);
-      //return newState2;
       return { add: action.payload.data, ...state }
     case FETCH_WHOSGOING:      
       let newState3 = new Object

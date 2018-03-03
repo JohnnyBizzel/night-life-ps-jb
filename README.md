@@ -15,7 +15,7 @@ Key Technologies Used:
 * Express
 * React
 * Redux
-* Mocha / Chai
+* Mocha / Chai (removed on glitch)
 * Sass
 * Bootstrap
 * HTML5 & CSS3

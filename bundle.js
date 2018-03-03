@@ -31030,7 +31030,6 @@
 	      // Need to do something to log user in
 	      this.props.handleUserAuthentication('signin', { email: email, password: password }).then(function () {
 	        _this2.props.fetchUser().then(function () {
-	          // - redirect to the route '/feature'
 	          _reactRouter.browserHistory.push('/feature');
 	        });
 	      });
@@ -34209,7 +34208,7 @@
 /* 328 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	'use strict';
+	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -34259,10 +34258,7 @@
 	      dispatch({ type: _types.AUTH_USER });
 	      // - Save the JWT token
 	      localStorage.setItem('token', response.data.token);
-	    })
-	    // If request is bad...
-	    // - Show an error to the user
-	    .catch(function (response) {
+	    }).catch(function (response) {
 	      if (response.status === 400) {
 	        dispatch(authError('Bad request'));
 	      } else if (response.status === 401) {
@@ -34325,11 +34321,26 @@
 	  }
 	}
 
+	// export function fetchYelp(city, userid) {
+	//   const url = `${ROOT_URL}/openapi/yelp?location=${city}&userid=${userid}`
+	//     return function(dispatch) {
+	//     return axios.get(url, {
+	//       headers: { authorization: localStorage.getItem('token') }
+	//     })
+	//       .then(response => {
+	//         dispatch({
+	//           type: FETCH_YELP,
+	//           payload: response
+	//         });
+	//       });
+	//   }
+	// }
+
 	function fetchYelp(city, userid) {
 	  var url = ROOT_URL + '/openapi/yelp?location=' + city + '&userid=' + userid;
 	  return function (dispatch) {
 	    return _axios2.default.get(url, {
-	      headers: { authorization: localStorage.getItem('token') }
+	      headers: { authorization: process.env.YELP_API }
 	    }).then(function (response) {
 	      dispatch({
 	        type: _types.FETCH_YELP,
@@ -34461,6 +34472,7 @@
 	    });
 	  };
 	}
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ }),
 /* 329 */
@@ -37112,11 +37124,6 @@
 
 	  switch (action.type) {
 	    case _types.FETCH_YELP:
-	      // let newState = new Object
-	      // newState = Object.assign({},state); 
-	      // if (action.payload.data){
-	      //   newState3.whosGoing = action.payload.data;
-	      // }
 	      return [action.payload.data];
 	  }
 	  return state;
@@ -37147,12 +37154,6 @@
 	      newState.fetch = action.payload.data;
 	      return newState;
 	    case _types.ADD_RSVP:
-	      // let newState2 = new Object
-	      // newState2 = Object.assign({},state); 
-	      // newState2.add = [];
-	      // // payload arrives "error occured"
-	      // newState2.add.push(action.payload.data);
-	      //return newState2;
 	      return _extends({ add: action.payload.data }, state);
 	    case _types.FETCH_WHOSGOING:
 	      var newState3 = new Object();
